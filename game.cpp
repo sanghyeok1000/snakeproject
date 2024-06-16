@@ -43,20 +43,6 @@ void generateItem(std::vector<std::vector<int>> &map, int itemType) {
     } while (map[y][x] != 0);
     map[y][x] = itemType;
 }
-void updateItemPositions(std::vector<std::vector<int>> &map) {
-    // 기존 아이템 위치를 초기화
-    for (int i = 0; i < MAP_HEIGHT; ++i) {
-        for (int j = 0; j < MAP_WIDTH; ++j) {
-            if (map[i][j] == GROWTH_ITEM || map[i][j] == POISON_ITEM) {
-                map[i][j] = 0;
-            }
-        }
-    }
-
-    // 새로운 위치에 아이템 생성
-    generateItem(map, GROWTH_ITEM);
-    generateItem(map, POISON_ITEM);
-}
 
 // 게이트 생성 함수
 void generateGate(std::vector<std::vector<int>> &map, std::pair<int, int> &gate1, std::pair<int, int> &gate2) {
@@ -75,6 +61,26 @@ void generateGate(std::vector<std::vector<int>> &map, std::pair<int, int> &gate1
     map[y2][x2] = GATE;
     gate1 = {y1, x1};
     gate2 = {y2, x2};
+}
+
+void updateItemAndGatePositions(std::vector<std::vector<int>> &map, std::pair<int, int> &gate1, std::pair<int, int> &gate2) {
+    // 기존 아이템 위치를 초기화
+    for (int i = 0; i < MAP_HEIGHT; ++i) {
+        for (int j = 0; j < MAP_WIDTH; ++j) {
+            if (map[i][j] == GROWTH_ITEM || map[i][j] == POISON_ITEM) {
+                map[i][j] = 0;
+            } else if (map[i][j] == GATE) {
+                map[i][j] = WALL;  // 게이트를 원래 벽으로 복구
+            }
+        }
+    }
+
+    // 새로운 위치에 아이템 생성
+    generateItem(map, GROWTH_ITEM);
+    generateItem(map, POISON_ITEM);
+
+    // 새로운 위치에 게이트 생성
+    generateGate(map, gate1, gate2);
 }
 
 // 초기화 함수
@@ -327,6 +333,14 @@ bool moveSnake(std::vector<std::vector<int>> &map, std::vector<SnakeSegment> &sn
 
     return true;
 }
+bool isSnakePassingGate(const std::vector<SnakeSegment> &snake, const std::pair<int, int> &gate1, const std::pair<int, int> &gate2) {
+    for (const auto &segment : snake) {
+        if ((segment.y == gate1.first && segment.x == gate1.second) || (segment.y == gate2.first && segment.x == gate2.second)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 // 게임 방법 화면 출력 함수
 void showInstructions() {
@@ -522,7 +536,9 @@ int main() {
 
                     // 5초마다 아이템 위치 업데이트
                     if (time(0) - lastUpdateTime >= 5) {
-                        updateItemPositions(map);
+                        if (!isSnakePassingGate(snake, gate1, gate2)) {
+                            updateItemAndGatePositions(map, gate1, gate2);
+                        }
                         lastUpdateTime = time(0);
                     }
                     if (slowDownEndTime > 0 && time(0) >= slowDownEndTime) {
