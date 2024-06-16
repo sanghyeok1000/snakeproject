@@ -305,6 +305,9 @@ bool moveSnake(std::vector<std::vector<int>> &map, std::vector<SnakeSegment> &sn
         if (snake.size() > 1) {
             map[snake.back().y][snake.back().x] = 0;
             snake.pop_back();
+            if (snake.size() < 3) {
+            return false; // Snake의 길이가 3 이하가 되면 게임 종료
+            }
         } else {
             return false; // Snake의 길이가 1 이하가 되면 게임 종료
         }
