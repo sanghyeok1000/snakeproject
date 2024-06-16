@@ -506,15 +506,35 @@ int main() {
                     switch (ch) {
                         case KEY_UP:
                             if (dir != DOWN) dir = UP;
+                            else {
+                                showGameOver(score, time(0) - startTime);
+                                missionComplete = false;
+                                break;
+                            }
                             break;
                         case KEY_DOWN:
                             if (dir != UP) dir = DOWN;
+                            else {
+                                showGameOver(score, time(0) - startTime);
+                                missionComplete = false;
+                                break;
+                            }
                             break;
                         case KEY_LEFT:
                             if (dir != RIGHT) dir = LEFT;
+                            else {
+                                showGameOver(score, time(0) - startTime);
+                                missionComplete = false;
+                                break;
+                            }
                             break;
                         case KEY_RIGHT:
                             if (dir != LEFT) dir = RIGHT;
+                            else {
+                                showGameOver(score, time(0) - startTime);
+                                missionComplete = false;
+                                break;
+                            }
                             break;
                         default:
                             break;
