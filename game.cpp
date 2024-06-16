@@ -21,6 +21,11 @@ const int SPECIAL_ITEM = 8;  // 새로운 아이템
 // Snake 방향
 enum Direction { UP, DOWN, LEFT, RIGHT };
 
+//속도 요소
+int speed = 100000; // 기본 속도 (0.1초 대기)
+int slowDownEndTime = 0; // 느린 속도가 끝나는 시간
+
+
 // Snake 구조체
 struct SnakeSegment {
     int y, x;
@@ -301,6 +306,8 @@ bool moveSnake(std::vector<std::vector<int>> &map, std::vector<SnakeSegment> &sn
     } else if (map[newY][newX] == SPECIAL_ITEM) {
         score += 5; // 새로운 아이템을 먹으면 점수 추가
         generateItem(map, SPECIAL_ITEM);
+        speed = 200000; // 1초 동안 속도 느리게 (0.2초 대기)
+        slowDownEndTime = time(0) + 1; // 1초 후에 속도 원복
     }
 
     // Snake 머리 이동
@@ -518,8 +525,11 @@ int main() {
                         updateItemPositions(map);
                         lastUpdateTime = time(0);
                     }
-
-                    usleep(100000); // 0.1초 대기 (뱀의 속도를 빠르게)
+                    if (slowDownEndTime > 0 && time(0) >= slowDownEndTime) {
+                            speed = 100000; // 기본 속도로 원복
+                            slowDownEndTime = 0; // 효과 시간 초기화
+                    }
+                    usleep(speed); // 0.1초 대기 (뱀의 속도를 빠르게)
 
                     // 미션 달성 여부 확인
                     if (maxLength >= 10 && growthItems >= 5 && poisonItems <= 2 && gateUses >= 1) {
