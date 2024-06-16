@@ -47,6 +47,14 @@ void generateItem(std::vector<std::vector<int>> &map, int itemType) {
 // 게이트 생성 함수
 void generateGate(std::vector<std::vector<int>> &map, std::pair<int, int> &gate1, std::pair<int, int> &gate2) {
     int y1, x1, y2, x2;
+
+    std::vector<std::pair<int, int>> corners = {
+        {0, 0}, {0, MAP_WIDTH - 1},
+        {MAP_HEIGHT - 1, 0}, {MAP_HEIGHT - 1, MAP_WIDTH - 1}
+    };
+    for (auto &corner : corners) {
+        map[corner.first][corner.second] = IMMUNE_WALL;
+    }
     do {
         y1 = rand() % MAP_HEIGHT;
         x1 = rand() % MAP_WIDTH;
@@ -98,6 +106,12 @@ void initGame(WINDOW *win, std::vector<std::vector<int>> &map, std::vector<Snake
     for (int i = 0; i < MAP_WIDTH; ++i) {
         map[0][i] = map[MAP_HEIGHT - 1][i] = WALL;
     }
+    //꼭짓점 부분에는 gate가 생기지 않도록 하는 부분
+    map[0][0] = IMMUNE_WALL;
+    map[0][MAP_WIDTH - 1] = IMMUNE_WALL;
+    map[MAP_HEIGHT - 1][0] = IMMUNE_WALL;
+    map[MAP_HEIGHT - 1][MAP_WIDTH - 1] = IMMUNE_WALL;
+
     
     // 스테이지별로 맵 지형 변경
     if (stage == 2) {
